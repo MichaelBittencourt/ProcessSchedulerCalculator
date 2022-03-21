@@ -2,15 +2,15 @@
 #include <iomanip>
 #include <iostream>
 
-void fcfs(std::queue<Process> processStack) {
+void fcfs(std::queue<Process> processQueue) {
     double finishTimeAverage = 0.0, waitTimeAverage = 0.0,
            responseTimeAverage = 0.0;
-    int qtdProcess = processStack.size();
+    int qtdProcess = processQueue.size();
     int clock = 0;
 
-    while (!processStack.empty()) {
-        Process process = processStack.front();
-        processStack.pop();
+    while (!processQueue.empty()) {
+        Process process = processQueue.front();
+        processQueue.pop();
         clock = clock == 0 ? process.arrivalTime : clock;
         int responseTime = clock - process.arrivalTime;
         int waitTime = responseTime;

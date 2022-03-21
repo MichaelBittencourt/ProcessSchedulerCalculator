@@ -4,6 +4,6 @@
 #include "process.h"
 #include <queue>
 
-void fcfs(std::queue<Process> processStack);
+void fcfs(std::queue<Process> processQueue);
 
 #endif
