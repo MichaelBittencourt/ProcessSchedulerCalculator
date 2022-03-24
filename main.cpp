@@ -1,5 +1,6 @@
 #include "fcfs.h"
 #include "process.h"
+#include "sjf.h"
 #include <iostream>
 #include <list>
 
@@ -16,4 +17,5 @@ int main() {
         processList.push_back(createProcess(arrivalTime, duration, i));
     }
     fcfs(processList);
+    sjf(processList);
 }
