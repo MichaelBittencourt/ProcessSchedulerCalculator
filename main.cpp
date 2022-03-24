@@ -9,13 +9,25 @@ using namespace std;
 int main() {
     int qtdProcess = 0;
     list<Process> processList;
+#ifdef VERBOSE
+    cout << "Reading Process Quantity" << endl;
+#endif
     cin >> qtdProcess;
     for (int i = 0; i < qtdProcess; i++) {
+#ifdef VERBOSE
+        cout << "Reading process: " << i << endl;
+#endif
         int arrivalTime = 0;
         int duration = 0;
         cin >> arrivalTime >> duration;
         processList.push_back(createProcess(arrivalTime, duration, i));
     }
+#ifdef VERBOSE
+    cout << "Starting fcfs" << endl;
+#endif
     fcfs(processList);
+#ifdef VERBOSE
+    cout << "Starting sjf: " << endl;
+#endif
     sjf(processList);
 }
