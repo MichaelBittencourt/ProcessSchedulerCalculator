@@ -2,8 +2,8 @@
 #define FCFS_H
 
 #include "process.h"
-#include <queue>
+#include <list>
 
-void fcfs(std::queue<Process> processQueue);
+void fcfs(std::list<Process> processList);
 
 #endif
