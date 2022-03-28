@@ -17,9 +17,9 @@ void sjf(std::list<Process> processList) {
     int waitTime = 0;
     std::list<Process>::iterator it = processList.begin();
     for (int clock = 0; true; clock++) {
-        sleep(1);
 
 #ifdef VERBOSE
+        sleep(1);
         std::cout << "clock: " << clock << std::endl;
 #endif
         while (it != processList.end() && clock == (*it).arrivalTime) {
