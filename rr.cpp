@@ -1,6 +1,7 @@
 #include "fcfs.h"
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <queue>
 #include <unistd.h>
 
@@ -15,14 +16,14 @@ void round_robin(std::list<Process> processList, int quantum) {
 
     Process running;
     std::list<Process>::iterator it = processList.begin();
-    for (int clock = 0; true; clock++) {
+    for (int clock = 0; clock < std::numeric_limits<int>::max(); clock++) {
 
-#ifdef VERBOSE1
-        // sleep(1);
+#ifdef VERBOSE
+        sleep(1);
         std::cout << "clock: " << clock << std::endl;
 #endif
         while (it != processList.end() && clock == (*it).arrivalTime) {
-#ifdef VERBOSE1
+#ifdef VERBOSE
             std::cout << "Process: " << (*it).id << " added on queue!"
                       << std::endl;
 #endif
@@ -30,7 +31,7 @@ void round_robin(std::list<Process> processList, int quantum) {
             it++;
         }
         if (addProcessOnNextInteraction) {
-#ifdef VERBOSE1
+#ifdef VERBOSE
             std::cout << "Process: " << running.id << " added on queue again!"
                       << std::endl;
 #endif
@@ -45,41 +46,21 @@ void round_robin(std::list<Process> processList, int quantum) {
                 processRunning = true;
                 actualQuantum = quantum;
                 runProcess(&running, clock);
-#ifdef VERBOSE1
+#ifdef VERBOSE
                 std::cout << "Start running!" << std::endl;
                 showProcessInfo(&running);
                 std::cout << "Quantum: " << actualQuantum << std::endl;
 #endif
-                runningOneTime(&running);
-                actualQuantum--;
-                if (running.duration == 0) {
-                    processRunning = false;
-                    finishTimeAverage += running.finishTime;
-                    responseTimeAverage += running.responseTime;
-                    waitTimeAverage += running.waitTime;
-#ifdef VERBOSE1
-                    std::cout << "Finish process!" << std::endl;
-                    showProcessInfo(&running);
-#endif
-                } else {
-                    if (actualQuantum == 0) {
-#ifdef VERBOSE1
-                        std::cout << "Mark to add process on Queue again!"
-                                  << std::endl;
-                        showProcessInfo(&running);
-                        std::cout << "Quantum: " << actualQuantum << std::endl;
-#endif
-                        addProcessOnNextInteraction = true;
-                        processRunning = false;
-                    }
-                }
             } else {
                 if (it == processList.end()) {
                     break;
                 }
             }
-        } else {
-#ifdef VERBOSE1
+        }
+        // I change to not use else because after set processRunning to true the
+        // first if also need run this code block
+        if (processRunning) {
+#ifdef VERBOSE
             std::cout << "Running!" << std::endl;
             showProcessInfo(&running);
             std::cout << "Quantum: " << actualQuantum << std::endl;
@@ -91,13 +72,13 @@ void round_robin(std::list<Process> processList, int quantum) {
                 finishTimeAverage += running.finishTime;
                 responseTimeAverage += running.responseTime;
                 waitTimeAverage += running.waitTime;
-#ifdef VERBOSE1
+#ifdef VERBOSE
                 std::cout << "Finish process!" << std::endl;
                 showProcessInfo(&running);
 #endif
             } else {
                 if (actualQuantum == 0) {
-#ifdef VERBOSE1
+#ifdef VERBOSE
                     std::cout << "Mark to add process on Queue again!"
                               << std::endl;
                     showProcessInfo(&running);

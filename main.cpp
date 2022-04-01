@@ -3,6 +3,7 @@
 #include "rr.h"
 #include "sjf.h"
 #include <iostream>
+#include <limits>
 #include <list>
 
 using namespace std;
@@ -32,8 +33,11 @@ int main() {
     cout << "Starting sjf: " << endl;
 #endif
     sjf(processList);
-#ifdef VERBOSE1
+#ifdef VERBOSE
     cout << "Starting round_robin: " << endl;
 #endif
+    // To do round_robin work equal the fcfs you only need set quantum to
+    // infinity, that in integer we can set as max integer
+    // round_robin(processList, std::numeric_limits<int>::max());
     round_robin(processList, quantum);
 }
