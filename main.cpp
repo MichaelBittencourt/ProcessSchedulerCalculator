@@ -9,11 +9,12 @@ using namespace std;
 
 int main() {
     int qtdProcess = 0;
+    int quantum = 0;
     list<Process> processList;
 #ifdef VERBOSE
     cout << "Reading Process Quantity" << endl;
 #endif
-    cin >> qtdProcess;
+    cin >> qtdProcess >> quantum;
     for (int i = 0; i < qtdProcess; i++) {
 #ifdef VERBOSE
         cout << "Reading process: " << i << endl;
@@ -34,5 +35,5 @@ int main() {
 #ifdef VERBOSE1
     cout << "Starting round_robin: " << endl;
 #endif
-    round_robin(processList, 2);
+    round_robin(processList, quantum);
 }
