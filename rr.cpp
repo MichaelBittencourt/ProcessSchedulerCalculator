@@ -18,7 +18,7 @@ void round_robin(std::list<Process> processList, int quantum) {
     for (int clock = 0; true; clock++) {
 
 #ifdef VERBOSE1
-        /* sleep(1); */
+        // sleep(1);
         std::cout << "clock: " << clock << std::endl;
 #endif
         while (it != processList.end() && clock == (*it).arrivalTime) {
@@ -52,6 +52,27 @@ void round_robin(std::list<Process> processList, int quantum) {
 #endif
                 runningOneTime(&running);
                 actualQuantum--;
+                if (running.duration == 0) {
+                    processRunning = false;
+                    finishTimeAverage += running.finishTime;
+                    responseTimeAverage += running.responseTime;
+                    waitTimeAverage += running.waitTime;
+#ifdef VERBOSE1
+                    std::cout << "Finish process!" << std::endl;
+                    showProcessInfo(&running);
+#endif
+                } else {
+                    if (actualQuantum == 0) {
+#ifdef VERBOSE1
+                        std::cout << "Mark to add process on Queue again!"
+                                  << std::endl;
+                        showProcessInfo(&running);
+                        std::cout << "Quantum: " << actualQuantum << std::endl;
+#endif
+                        addProcessOnNextInteraction = true;
+                        processRunning = false;
+                    }
+                }
             } else {
                 if (it == processList.end()) {
                     break;
