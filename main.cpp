@@ -1,5 +1,6 @@
 #include "fcfs.h"
 #include "process.h"
+#include "rr.h"
 #include "sjf.h"
 #include <iostream>
 #include <list>
@@ -30,4 +31,8 @@ int main() {
     cout << "Starting sjf: " << endl;
 #endif
     sjf(processList);
+#ifdef VERBOSE1
+    cout << "Starting round_robin: " << endl;
+#endif
+    round_robin(processList, 2);
 }

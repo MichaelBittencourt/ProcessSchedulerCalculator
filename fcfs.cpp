@@ -1,4 +1,5 @@
 #include "fcfs.h"
+#include "process.h"
 #include <iomanip>
 #include <iostream>
 #include <queue>
@@ -12,9 +13,6 @@ void fcfs(std::list<Process> processList) {
     bool processRunning = false;
 
     Process running;
-    int finishTime = 0;
-    int responseTime = 0;
-    int waitTime = 0;
     std::list<Process>::iterator it = processList.begin();
     for (int clock = 0; true; clock++) {
 
@@ -35,18 +33,12 @@ void fcfs(std::list<Process> processList) {
                 running = processQueue.front();
                 processQueue.pop();
                 processRunning = true;
-                responseTime = clock - running.arrivalTime;
-                waitTime = responseTime;
-                finishTime = responseTime;
+                runProcess(&running, clock);
 #ifdef VERBOSE
-                std::cout << "Process " << running.id << ": ["
-                          << running.duration << "] Start running!"
-                          << std::endl;
-                std::cout << "Process: " << finishTime << " " << responseTime
-                          << " " << waitTime << std::endl;
+                std::cout << "Start running!" << std::endl;
+                showProcessInfo(&process);
 #endif
-                finishTime++;
-                running.duration--;
+                runningOneTime(&running);
             } else {
                 if (it == processList.end()) {
                     break;
@@ -54,28 +46,19 @@ void fcfs(std::list<Process> processList) {
             }
         } else {
 #ifdef VERBOSE
-            std::cout << "Process " << running.id << ": [" << running.duration
-                      << "] running!" << std::endl;
-            std::cout << "Process: " << finishTime << " " << responseTime << " "
-                      << waitTime << std::endl;
+            std::cout << "Running!" << std::endl;
+            showProcessInfo(running;)
 #endif
-            running.duration--;
-            finishTime++;
+                runningOneTime(&running);
             if (running.duration == 0) {
                 processRunning = false;
-                finishTimeAverage += finishTime;
-                responseTimeAverage += responseTime;
-                waitTimeAverage += waitTime;
+                finishTimeAverage += running.finishTime;
+                responseTimeAverage += running.responseTime;
+                waitTimeAverage += running.waitTime;
 #ifdef VERBOSE
-                std::cout << "Process " << running.id << ": ["
-                          << running.duration << "] finish!" << std::endl;
-                std::cout << "Process: " << finishTime << " " << responseTime
-                          << " " << waitTime << std::endl;
+                std::cout << "Finish process!" << std::endl;
+                showProcessInfo(&process);
 #endif
-                finishTime = 0;
-                responseTime = 0;
-                waitTime = 0;
-                continue;
             }
         }
     }
