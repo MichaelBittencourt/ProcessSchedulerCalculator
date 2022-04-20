@@ -1,4 +1,4 @@
-//#include "fcfs.h"
+#include "fcfs.h"
 #include "process.h"
 #include "rr.h"
 //#include "sjf.h"
@@ -29,7 +29,7 @@ int main() {
     cout << "Starting fcfs" << endl;
 #endif
     // fcfs(processList);
-    RoundRobin fcfs(processList, std::numeric_limits<int>::max());
+    Fcfs fcfs(processList);
     fcfs.run();
     fcfs.showAverageMetrics();
 #ifdef VERBOSE

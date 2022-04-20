@@ -2,8 +2,9 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
-#include <queue>
 #include <unistd.h>
+
+string RoundRobin::classString() { return "RR"; }
 
 RoundRobin::RoundRobin(std::list<Process> processList, int quantum)
     : _processList(processList), _quantum(quantum), finishTime(0.0),
@@ -29,7 +30,7 @@ void RoundRobin::showAverageMetrics() {
 
     std::cout << std::setprecision(1) << std::fixed;
 
-    std::cout << "RR:";
+    std::cout << classString() << ":";
     for (vector<double>::iterator it = metrics.begin(); it != metrics.end();
          it++) {
         cout << " " << (*it);
@@ -38,7 +39,6 @@ void RoundRobin::showAverageMetrics() {
 }
 
 void RoundRobin::run() {
-    std::queue<Process *> processQueue;
     bool addProcessOnNextInteraction = false;
 
     std::list<Process>::iterator it = _processList.begin();
@@ -53,7 +53,7 @@ void RoundRobin::run() {
             std::cout << "Process: " << (*it).getId() << " added on queue!"
                       << std::endl;
 #endif
-            processQueue.push(&(*it));
+            this->push(&(*it));
             it++;
         }
         if (addProcessOnNextInteraction) {
@@ -62,13 +62,12 @@ void RoundRobin::run() {
                       << " added on queue again!" << std::endl;
 #endif
             running->setArrivalTime(clock);
-            processQueue.push(running);
+            this->push(running);
             addProcessOnNextInteraction = false;
         }
         if (!processRunning) {
-            if (!processQueue.empty()) {
-                running = processQueue.front();
-                processQueue.pop();
+            if (!isQueueEmpty()) {
+                running = this->pop();
                 processRunning = true;
                 running->run(clock, _quantum);
 #ifdef VERBOSE
@@ -116,3 +115,13 @@ void RoundRobin::run() {
         }
     }
 }
+
+void RoundRobin::push(Process *process) { processQueue.push(process); }
+
+Process *RoundRobin::pop() {
+    Process *ret = processQueue.front();
+    processQueue.pop();
+    return ret;
+}
+
+bool RoundRobin::isQueueEmpty() { return processQueue.empty(); }
