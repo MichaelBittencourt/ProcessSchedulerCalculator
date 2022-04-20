@@ -1,29 +1,56 @@
-#include "fcfs.h"
+#include "rr.h"
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <queue>
 #include <unistd.h>
 
-void round_robin(std::list<Process> processList, int quantum) {
-    double finishTimeAverage = 0.0, waitTimeAverage = 0.0,
-           responseTimeAverage = 0.0;
-    int qtdProcess = processList.size();
+RoundRobin::RoundRobin(std::list<Process> processList, int quantum)
+    : _processList(processList), _quantum(quantum), finishTime(0.0),
+      responseTime(0.0), waitTime(0.0), processRunning(false),
+      running(nullptr) {}
+
+RoundRobin::~RoundRobin() { running = nullptr; }
+
+void RoundRobin::cleanMetrics() { finishTime = waitTime = responseTime = 0.0; }
+
+int RoundRobin::getQtdProcess() { return _processList.size(); }
+
+vector<double> RoundRobin::getAverageMetrics() {
+    vector<double> ret(3);
+    ret[0] = (this->finishTime /= this->getQtdProcess());
+    ret[1] = (this->responseTime /= this->getQtdProcess());
+    ret[2] = (this->waitTime /= this->getQtdProcess());
+    return ret;
+}
+
+void RoundRobin::showAverageMetrics() {
+    vector<double> metrics = getAverageMetrics();
+
+    std::cout << std::setprecision(1) << std::fixed;
+
+    std::cout << "RR:";
+    for (vector<double>::iterator it = metrics.begin(); it != metrics.end();
+         it++) {
+        cout << " " << (*it);
+    }
+    cout << std::endl;
+}
+
+void RoundRobin::run() {
     std::queue<Process *> processQueue;
-    bool processRunning = false;
     bool addProcessOnNextInteraction = false;
 
-    Process *running = nullptr;
-    std::list<Process>::iterator it = processList.begin();
+    std::list<Process>::iterator it = _processList.begin();
     for (int clock = 0; clock < std::numeric_limits<int>::max(); clock++) {
 
 #ifdef VERBOSE
         sleep(1);
         std::cout << "clock: " << clock << std::endl;
 #endif
-        while (it != processList.end() && clock == (*it).getArrivalTime()) {
+        while (it != _processList.end() && clock == (*it).getArrivalTime()) {
 #ifdef VERBOSE
-            std::cout << "Process: " << (*it).id << " added on queue!"
+            std::cout << "Process: " << (*it).getId() << " added on queue!"
                       << std::endl;
 #endif
             processQueue.push(&(*it));
@@ -43,14 +70,14 @@ void round_robin(std::list<Process> processList, int quantum) {
                 running = processQueue.front();
                 processQueue.pop();
                 processRunning = true;
-                running->run(clock, quantum);
+                running->run(clock, _quantum);
 #ifdef VERBOSE
                 std::cout << "Start running!" << std::endl;
                 std::cout << (*running) << std::endl;
                 std::cout << "Quantum: " << running->getQuantum() << std::endl;
 #endif
             } else {
-                if (it == processList.end()) {
+                if (it == _processList.end()) {
                     break;
                 }
             }
@@ -66,12 +93,12 @@ void round_robin(std::list<Process> processList, int quantum) {
             running->runningOneTime();
             if (running->isFinish()) {
                 processRunning = false;
-                finishTimeAverage += running->getFinishTime();
-                responseTimeAverage += running->getResponseTime();
-                waitTimeAverage += running->getWaitTime();
+                finishTime += running->getFinishTime();
+                responseTime += running->getResponseTime();
+                waitTime += running->getWaitTime();
 #ifdef VERBOSE
                 std::cout << "Finish process!" << std::endl;
-                showProcessInfo(&running);
+                std::cout << (*running) << std::endl;
 #endif
             } else {
                 if (running->isFinishQuantum()) {
@@ -88,13 +115,4 @@ void round_robin(std::list<Process> processList, int quantum) {
             }
         }
     }
-
-    finishTimeAverage /= qtdProcess;
-    responseTimeAverage /= qtdProcess;
-    waitTimeAverage /= qtdProcess;
-
-    std::cout << std::setprecision(1) << std::fixed;
-
-    std::cout << "RR: " << finishTimeAverage << " " << responseTimeAverage
-              << " " << waitTimeAverage << std::endl;
 }

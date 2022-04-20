@@ -29,7 +29,9 @@ int main() {
     cout << "Starting fcfs" << endl;
 #endif
     // fcfs(processList);
-    round_robin(processList, std::numeric_limits<int>::max());
+    RoundRobin fcfs(processList, std::numeric_limits<int>::max());
+    fcfs.run();
+    fcfs.showAverageMetrics();
 #ifdef VERBOSE
     cout << "Starting sjf: " << endl;
 #endif
@@ -40,5 +42,7 @@ int main() {
     // To do round_robin work equal the fcfs you only need set quantum to
     // infinity, that in integer we can set as max integer
     // round_robin(processList, std::numeric_limits<int>::max());
-    round_robin(processList, quantum);
+    RoundRobin rr(processList, quantum);
+    rr.run();
+    rr.showAverageMetrics();
 }
