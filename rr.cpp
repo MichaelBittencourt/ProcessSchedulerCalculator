@@ -9,12 +9,11 @@ void round_robin(std::list<Process> processList, int quantum) {
     double finishTimeAverage = 0.0, waitTimeAverage = 0.0,
            responseTimeAverage = 0.0;
     int qtdProcess = processList.size();
-    std::queue<Process> processQueue;
+    std::queue<Process *> processQueue;
     bool processRunning = false;
-    int actualQuantum = 0;
     bool addProcessOnNextInteraction = false;
 
-    Process running;
+    Process *running = nullptr;
     std::list<Process>::iterator it = processList.begin();
     for (int clock = 0; clock < std::numeric_limits<int>::max(); clock++) {
 
@@ -22,20 +21,20 @@ void round_robin(std::list<Process> processList, int quantum) {
         sleep(1);
         std::cout << "clock: " << clock << std::endl;
 #endif
-        while (it != processList.end() && clock == (*it).arrivalTime) {
+        while (it != processList.end() && clock == (*it).getArrivalTime()) {
 #ifdef VERBOSE
             std::cout << "Process: " << (*it).id << " added on queue!"
                       << std::endl;
 #endif
-            processQueue.push((*it));
+            processQueue.push(&(*it));
             it++;
         }
         if (addProcessOnNextInteraction) {
 #ifdef VERBOSE
-            std::cout << "Process: " << running.id << " added on queue again!"
-                      << std::endl;
+            std::cout << "Process: " << running->getId()
+                      << " added on queue again!" << std::endl;
 #endif
-            running.arrivalTime = clock;
+            running->setArrivalTime(clock);
             processQueue.push(running);
             addProcessOnNextInteraction = false;
         }
@@ -44,12 +43,11 @@ void round_robin(std::list<Process> processList, int quantum) {
                 running = processQueue.front();
                 processQueue.pop();
                 processRunning = true;
-                actualQuantum = quantum;
-                runProcess(&running, clock);
+                running->run(clock, quantum);
 #ifdef VERBOSE
                 std::cout << "Start running!" << std::endl;
-                showProcessInfo(&running);
-                std::cout << "Quantum: " << actualQuantum << std::endl;
+                std::cout << (*running) << std::endl;
+                std::cout << "Quantum: " << running->getQuantum() << std::endl;
 #endif
             } else {
                 if (it == processList.end()) {
@@ -62,27 +60,27 @@ void round_robin(std::list<Process> processList, int quantum) {
         if (processRunning) {
 #ifdef VERBOSE
             std::cout << "Running!" << std::endl;
-            showProcessInfo(&running);
-            std::cout << "Quantum: " << actualQuantum << std::endl;
+            std::cout << (*running) << std::endl;
+            std::cout << "Quantum: " << running->getQuantum() << std::endl;
 #endif
-            runningOneTime(&running);
-            actualQuantum--;
-            if (running.duration == 0) {
+            running->runningOneTime();
+            if (running->isFinish()) {
                 processRunning = false;
-                finishTimeAverage += running.finishTime;
-                responseTimeAverage += running.responseTime;
-                waitTimeAverage += running.waitTime;
+                finishTimeAverage += running->getFinishTime();
+                responseTimeAverage += running->getResponseTime();
+                waitTimeAverage += running->getWaitTime();
 #ifdef VERBOSE
                 std::cout << "Finish process!" << std::endl;
                 showProcessInfo(&running);
 #endif
             } else {
-                if (actualQuantum == 0) {
+                if (running->isFinishQuantum()) {
 #ifdef VERBOSE
                     std::cout << "Mark to add process on Queue again!"
                               << std::endl;
-                    showProcessInfo(&running);
-                    std::cout << "Quantum: " << actualQuantum << std::endl;
+                    std::cout << (*running) << std::endl;
+                    std::cout << "Quantum: " << running->getQuantum()
+                              << std::endl;
 #endif
                     addProcessOnNextInteraction = true;
                     processRunning = false;

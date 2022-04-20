@@ -1,7 +1,7 @@
-#include "fcfs.h"
+//#include "fcfs.h"
 #include "process.h"
 #include "rr.h"
-#include "sjf.h"
+//#include "sjf.h"
 #include <iostream>
 #include <limits>
 #include <list>
@@ -23,16 +23,17 @@ int main() {
         int arrivalTime = 0;
         int duration = 0;
         cin >> arrivalTime >> duration;
-        processList.push_back(createProcess(arrivalTime, duration, i));
+        processList.push_back(Process(arrivalTime, duration));
     }
 #ifdef VERBOSE
     cout << "Starting fcfs" << endl;
 #endif
-    fcfs(processList);
+    // fcfs(processList);
+    round_robin(processList, std::numeric_limits<int>::max());
 #ifdef VERBOSE
     cout << "Starting sjf: " << endl;
 #endif
-    sjf(processList);
+    // sjf(processList);
 #ifdef VERBOSE
     cout << "Starting round_robin: " << endl;
 #endif
