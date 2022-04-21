@@ -16,6 +16,10 @@ Process::Process(int arrivalTime, int duration, int quantum)
       responseTime(-1), waitTime(0), finishTime(0), id(Process::getGlobalId()) {
 }
 
+Process::Process()
+    : _arrivalTime(0), _duration(0), _quantum(0), responseTime(-1), waitTime(0),
+      finishTime(0), id(0) {}
+
 Process::~Process() {}
 
 Process::Process(int arrivalTime, int duration)

@@ -1,7 +1,7 @@
 #include "fcfs.h"
 #include "process.h"
 #include "rr.h"
-//#include "sjf.h"
+#include "sjf.h"
 #include <iostream>
 #include <limits>
 #include <list>
@@ -35,7 +35,9 @@ int main() {
 #ifdef VERBOSE
     cout << "Starting sjf: " << endl;
 #endif
-    // sjf(processList);
+    Sjf sjf(processList);
+    sjf.run();
+    sjf.showAverageMetrics();
 #ifdef VERBOSE
     cout << "Starting round_robin: " << endl;
 #endif
@@ -45,4 +47,5 @@ int main() {
     RoundRobin rr(processList, quantum);
     rr.run();
     rr.showAverageMetrics();
+    return 0;
 }

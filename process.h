@@ -23,6 +23,7 @@ class Process {
   public:
     Process(int arrivalTime, int duration);
     Process(int arrivalTime, int duration, int quantum);
+    Process();
     ~Process();
 
     bool operator<(const Process &process) const;
