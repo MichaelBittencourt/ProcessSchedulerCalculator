@@ -10,7 +10,13 @@ ASSEMBLER_FLAGS= -S -fno-asynchronous-unwind-tables
 FLAGS=$(CPP_FLAGS) $(INCLUDE) $(DEFINES) $(OTIMIZATION)
 
 SRC=$(wildcard *.cpp)
-OBJ=$(subst .cpp,.o,$(SRC))
+#OBJ=$(subst .cpp,.o,$(SRC))
+OBJ=main.o \
+	process.o \
+	rr.o \
+	fcfs.o \
+	sjf.o \
+
 ASM=$(subst .cpp,.asm,$(SRC))
 
 BIN=prog
