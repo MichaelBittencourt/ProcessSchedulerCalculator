@@ -11,7 +11,9 @@ class RoundRobin {
   private:
     std::list<Process> _processList;
     std::queue<Process *> processQueue;
+    std::list<Process>::iterator newProcess;
     int _quantum;
+    int _clock;
     double finishTime;
     double responseTime;
     double waitTime;
@@ -22,7 +24,12 @@ class RoundRobin {
     virtual void push(Process *process);
     virtual Process *pop();
     virtual bool isQueueEmpty();
+    virtual Process *getNextProcess();
+    virtual bool isFinishScheduler();
+    virtual bool thereNewProcess();
     virtual string classString();
+    void setClock(int clock);
+    int getClock();
 
   public:
     RoundRobin(std::list<Process> processList, int quantum);

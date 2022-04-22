@@ -8,8 +8,8 @@ string RoundRobin::classString() { return "RR"; }
 
 RoundRobin::RoundRobin(std::list<Process> processList, int quantum)
     : _processList(processList), _quantum(quantum), finishTime(0.0),
-      responseTime(0.0), waitTime(0.0), processRunning(false),
-      running(nullptr) {}
+      responseTime(0.0), waitTime(0.0), processRunning(false), running(nullptr),
+      newProcess(_processList.begin()) {}
 
 RoundRobin::~RoundRobin() { running = nullptr; }
 
@@ -41,27 +41,27 @@ void RoundRobin::showAverageMetrics() {
 void RoundRobin::run() {
     bool addProcessOnNextInteraction = false;
 
-    std::list<Process>::iterator it = _processList.begin();
-    for (int clock = 0; clock < std::numeric_limits<int>::max(); clock++) {
+    for (setClock(0); getClock() < std::numeric_limits<int>::max();
+         setClock(getClock() + 1)) {
 
 #ifdef VERBOSE
         sleep(1);
-        std::cout << "clock: " << clock << std::endl;
+        std::cout << "clock: " << getClock() << std::endl;
 #endif
-        while (it != _processList.end() && clock == (*it).getArrivalTime()) {
+        while (!isFinishScheduler() && thereNewProcess()) {
+            Process *process = getNextProcess();
 #ifdef VERBOSE
-            std::cout << "Process: " << (*it).getId() << " added on queue!"
+            std::cout << "Process: " << process->getId() << " added on queue!"
                       << std::endl;
 #endif
-            this->push(&(*it));
-            it++;
+            this->push(process);
         }
         if (addProcessOnNextInteraction) {
 #ifdef VERBOSE
             std::cout << "Process: " << running->getId()
                       << " added on queue again!" << std::endl;
 #endif
-            running->setArrivalTime(clock);
+            running->setArrivalTime(getClock());
             this->push(running);
             addProcessOnNextInteraction = false;
         }
@@ -69,14 +69,14 @@ void RoundRobin::run() {
             if (!isQueueEmpty()) {
                 running = this->pop();
                 processRunning = true;
-                running->run(clock, _quantum);
+                running->run(getClock(), _quantum);
 #ifdef VERBOSE
                 std::cout << "Start running!" << std::endl;
                 std::cout << (*running) << std::endl;
                 std::cout << "Quantum: " << running->getQuantum() << std::endl;
 #endif
             } else {
-                if (it == _processList.end()) {
+                if (isFinishScheduler()) {
                     break;
                 }
             }
@@ -125,3 +125,21 @@ Process *RoundRobin::pop() {
 }
 
 bool RoundRobin::isQueueEmpty() { return processQueue.empty(); }
+
+bool RoundRobin::isFinishScheduler() {
+    return newProcess == _processList.end();
+}
+
+int RoundRobin::getClock() { return _clock; }
+
+void RoundRobin::setClock(int clock) { _clock = clock; }
+
+bool RoundRobin::thereNewProcess() {
+    return getClock() == (*newProcess).getArrivalTime();
+}
+
+Process *RoundRobin::getNextProcess() {
+    Process *ret = &(*newProcess);
+    newProcess++;
+    return ret;
+}
